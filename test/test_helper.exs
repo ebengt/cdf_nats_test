@@ -5,7 +5,7 @@ defmodule NatsTestIex.TestHelper do
     cdr_await_process(nil)
     # Allow old items in stream to propagate
     Process.sleep(999)
-    NatsTestIex.CDR.get() |> cdr_await_empty()
+    NatsTestIex.CDR.get() |> cdr_await_empty("")
   end
 
   def cdr_get_one(), do: NatsTestIex.CDR.get() |> cdr_get_one()
@@ -22,24 +22,29 @@ defmodule NatsTestIex.TestHelper do
     pid
   end
 
-  def cdr_stop(pid, kind), do: Process.exit(pid, kind)
+  def cdr_stop(pid, kind) do
+    # Allow old items in stream to propagate
+    Process.sleep(999)
+    NatsTestIex.CDR.get() |> cdr_await_empty("stop")
+    Process.exit(pid, kind)
+  end
 
   #
   # Internal functions
   #
 
-  defp cdr_await_empty([]), do: :ok
+  defp cdr_await_empty([], _), do: :ok
 
-  defp cdr_await_empty([old]) do
-    IO.puts("Unempty CDR: #{Kernel.inspect(old)}")
-    NatsTestIex.CDR.get() |> cdr_await_empty()
+  defp cdr_await_empty([old], label) do
+    IO.puts("Unempty CDR #{label}: #{Kernel.inspect(old)}")
+    NatsTestIex.CDR.get() |> cdr_await_empty(label)
   end
 
   defp cdr_await_process(nil), do: NatsTestIex.CDR |> Process.whereis() |> cdr_await_process()
   defp cdr_await_process(_), do: :ok
 
   defp cdr_get_one([]) do
-    Process.sleep(900)
+    Process.sleep(999)
     NatsTestIex.CDR.get() |> cdr_get_one()
   end
 

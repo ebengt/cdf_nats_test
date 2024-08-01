@@ -46,10 +46,7 @@ defmodule NatsTestIex.CDR do
 
   defp ack_next(body), do: body
 
-  defp body(%{body: body} = message) do
-    Jetstream.ack_next(message, "cdr")
-    body
-  end
+  defp body(%{body: body} = _message), do: body
 
   defp body(body), do: body
 end
