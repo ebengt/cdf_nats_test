@@ -151,6 +151,9 @@ defmodule NatsTestIex do
     Consumer.delete(:gnat, "HELLO", "SEARCHER")
   end
 
+  def small_test_name(),
+    do: "small"
+
   defp cdr_consumer_correct({:ok, info}, config) do
     config_keys = Map.keys(config)
     f = fn value -> value end
@@ -243,5 +246,5 @@ defmodule NatsTestIex do
   defp small_test_create(false), do: :ok
 
   defp small_test_create(_),
-    do: create_stream_consumer("small", ["small.string"], 10_000_000, 200)
+    do: create_stream_consumer(small_test_name(), ["small.string"], 10_000_000, 200)
 end
